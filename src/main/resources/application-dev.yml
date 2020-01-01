@@ -1,5 +1,5 @@
 spring:
   r2dbc:
-    url: r2dbc:pool:mysql://127.0.0.1:33306/todo
+    url: r2dbc:mysql://127.0.0.1:33306/todo
     username: root
     password: mysql

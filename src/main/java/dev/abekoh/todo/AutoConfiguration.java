@@ -15,7 +15,7 @@ public class AutoConfiguration {
     @Bean
     RouterFunction<ServerResponse> routes(TodoHandler todoHandler) {
         return RouterFunctions.route(
-                RequestPredicates.GET("/todo").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
+                RequestPredicates.GET("/task/{taskId}"),
                 todoHandler::get);
     }
 }
