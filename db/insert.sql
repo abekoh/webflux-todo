@@ -1,46 +1,40 @@
-insert into
-  task(
+INSERT INTO
+  todo.task (
     created_on,
     updated_on,
     task_id,
     text,
     deadline,
     completed,
-    deleted
+    deleted,
+    priority_rank,
+    task_list_id
   )
-values
+VALUES
   (
-    sysdate(),
-    sysdate(),
-    null,
+    '2020-01-01 05:37:10',
+    '2020-01-01 05:37:10',
+    NULL,
     '御飯食べる',
-    sysdate() + interval 1 day,
-    false,
-    false
+    '2020-01-02 05:37:10',
+    0,
+    0,
+    0,
+    1
   );
-
-insert into
-  task_list(
+INSERT INTO
+  todo.task_list (
     created_on,
     updated_on,
     task_list_id,
-    todo_rank,
-    task_id
+    name,
+    priority_rank
   )
-values
+VALUES
   (
-    sysdate(),
-    sysdate(),
-    null,
-    1,
-    (
-      select
-        task_id
-      from
-        task
-      order by
-        task_id
-      limit
-        1
-    )
+    '2020-01-01 16:10:53',
+    '2020-01-01 16:10:59',
+    NULL,
+    'プライベート',
+    1
   );
