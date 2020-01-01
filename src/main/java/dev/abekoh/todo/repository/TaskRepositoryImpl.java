@@ -29,7 +29,7 @@ public class TaskRepositoryImpl implements TaskRepository {
                 .select().from("task")
                 .matching(Criteria.where("task_id").is(taskId))
                 .as(Task.class).fetch().one()
-                .switchIfEmpty(Mono.error(new RuntimeException("Task is not found.")));
+                .switchIfEmpty(Mono.empty());
     }
 
     @Override

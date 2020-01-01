@@ -1,5 +1,6 @@
 package dev.abekoh.todo.handler;
 
+import dev.abekoh.todo.entity.Task;
 import dev.abekoh.todo.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -25,14 +25,19 @@ public class TaskHandler {
     }
 
     public Mono<ServerResponse> getOne(ServerRequest request) {
-        return this.service.getTaskById(Integer.parseInt(request.pathVariable("taskId")))
-                .flatMap(b -> ServerResponse
-                        .created(request.uriBuilder().build())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromObject(b)));
+        int taskId = Integer.parseInt(request.pathVariable("taskId"));
+        Mono<ServerResponse> notFound = ServerResponse
+                .notFound()
+                .build();
+        Mono<Task> taskMono = service.getTaskById(taskId);
+        return taskMono.flatMap(task -> ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(task)))
+                .switchIfEmpty(notFound);
     }
 
-    public Flux<ServerResponse> getAll(ServerRequest request) {
+    public Mono<ServerResponse> getAll(ServerRequest request) {
         return null;
     }
 
