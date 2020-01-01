@@ -27,30 +27,34 @@ public class TaskHandler {
 
     public Mono<ServerResponse> addOne(ServerRequest request) {
         logger.info("addOne: " + request);
-        Mono<Task> taskMono = service.addTask(request.bodyToMono(Task.class));
-        return taskMono.flatMap(task -> ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(task)))
+        return service.addTask(request.bodyToMono(Task.class))
+                .flatMap(task -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(task)))
                 .switchIfEmpty(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     public Mono<ServerResponse> getOne(ServerRequest request) {
         logger.info("getOne: " + request);
         long taskId = Long.parseLong(request.pathVariable("taskId"));
-        Mono<ServerResponse> notFound = ServerResponse
-                .notFound()
-                .build();
-        Mono<Task> taskMono = service.getTaskById(taskId);
-        return taskMono.flatMap(task -> ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(task)))
-                .switchIfEmpty(notFound);
+        return service.getTaskById(taskId)
+                .flatMap(task -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(task)))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
-        return null;
+        logger.info("getAll: " + request);
+        return service.getTaskAll()
+                .collectList()
+                .flatMap(tasks -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(tasks)))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> updateOne(ServerRequest request) {

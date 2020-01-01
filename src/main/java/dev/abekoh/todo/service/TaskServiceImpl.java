@@ -35,16 +35,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Flux<Task> getTaskAll() {
-        return null;
+        return repository.getAll();
     }
 
     @Override
     public Mono<Integer> updateTask(Mono<Task> task) {
-        return null;
+        return repository.update(task);
     }
 
     @Override
     public Mono<Integer> removeTaskById(long taskId) {
-        return null;
+        return repository.removeById(taskId);
     }
 }
