@@ -9,7 +9,7 @@ create table todo.task (
 );
 create table todo.task_list (
   created_on datetime not null,
-  updated_On datetime not null,
+  updated_on datetime not null,
   task_list_id int auto_increment primary key,
   todo_rank int not null,
   task_id int not null,
