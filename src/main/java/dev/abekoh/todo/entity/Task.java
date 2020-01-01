@@ -1,15 +1,17 @@
 package dev.abekoh.todo.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder(toBuilder = true)
 public class Task {
 
-    private int taskId;
+    private long taskId;
 
-    private int taskListId;
+    private long taskListId;
 
     private LocalDateTime createdOn;
 
@@ -23,5 +25,5 @@ public class Task {
 
     private Boolean deleted;
 
-    private int priorityRank;
+    private long priorityRank;
 }

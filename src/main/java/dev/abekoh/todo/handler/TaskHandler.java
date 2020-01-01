@@ -2,7 +2,10 @@ package dev.abekoh.todo.handler;
 
 import dev.abekoh.todo.entity.Task;
 import dev.abekoh.todo.service.TaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -13,6 +16,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class TaskHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(TaskHandler.class);
+
     private final TaskService service;
 
     @Autowired
@@ -21,14 +26,18 @@ public class TaskHandler {
     }
 
     public Mono<ServerResponse> addOne(ServerRequest request) {
-        Mono<Task> requestTask = request.bodyToMono(Task.class);
-        return ServerResponse
+        logger.info("addOne: " + request);
+        Mono<Task> taskMono = service.addTask(request.bodyToMono(Task.class));
+        return taskMono.flatMap(task -> ServerResponse
                 .ok()
-                .build(service.addTask(requestTask));
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(task)))
+                .switchIfEmpty(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     public Mono<ServerResponse> getOne(ServerRequest request) {
-        int taskId = Integer.parseInt(request.pathVariable("taskId"));
+        logger.info("getOne: " + request);
+        long taskId = Long.parseLong(request.pathVariable("taskId"));
         Mono<ServerResponse> notFound = ServerResponse
                 .notFound()
                 .build();

@@ -19,35 +19,62 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public Mono<Void> add(Mono<Task> task) {
+    public Mono<Task> add(Mono<Task> task) {
         return task.flatMap(t -> databaseClient
                 .insert()
                 .into(Task.class)
                 .using(t)
-                .then());
+                .fetch()
+                .one()
+                .map(map -> t
+                        .toBuilder()
+                        .taskId((long) map.get("LAST_INSERT_ID"))
+                        .build())
+        );
     }
 
     @Override
-    public Mono<Task> getById(int taskId) {
+    public Mono<Task> getById(long taskId) {
         return databaseClient
-                .select().from("task")
+                .select()
+                .from("task")
                 .matching(Criteria.where("task_id").is(taskId))
-                .as(Task.class).fetch().one()
+                .matching(Criteria.where("deleted").is("0"))
+                .as(Task.class)
+                .fetch()
+                .one()
                 .switchIfEmpty(Mono.empty());
     }
 
     @Override
     public Flux<Task> getAll() {
-        return null;
+        return databaseClient
+                .select().from("task")
+                .matching(Criteria.where("deleted").is("0"))
+                .as(Task.class)
+                .fetch()
+                .all()
+                .switchIfEmpty(Flux.empty());
     }
 
     @Override
-    public Mono<Task> update(Mono<Task> task) {
-        return null;
+    public Mono<Integer> update(Mono<Task> task) {
+        return task.flatMap(t -> databaseClient
+                .update()
+                .table(Task.class)
+                .using(t)
+                .fetch()
+                .rowsUpdated()
+        );
     }
 
     @Override
-    public boolean removeById(int taskId) {
-        return false;
+    public Mono<Integer> removeById(long taskId) {
+        return databaseClient
+                .delete()
+                .from(Task.class)
+                .matching(Criteria.where("task_id").is(taskId))
+                .fetch()
+                .rowsUpdated();
     }
 }

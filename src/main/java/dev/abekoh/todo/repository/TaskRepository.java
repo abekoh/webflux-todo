@@ -6,14 +6,14 @@ import reactor.core.publisher.Mono;
 
 public interface TaskRepository {
 
-    Mono<Void> add(Mono<Task> task);
+    Mono<Task> add(Mono<Task> task);
 
-    Mono<Task> getById(int taskId);
+    Mono<Task> getById(long taskId);
 
     Flux<Task> getAll();
 
-    Mono<Task> update(Mono<Task> task);
+    Mono<Integer> update(Mono<Task> task);
 
-    boolean removeById(int taskId);
+    Mono<Integer> removeById(long taskId);
 
 }

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Service
 public class TaskServiceImpl implements TaskService {
 
@@ -18,12 +20,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Void> addTask(Mono<Task> task) {
-        return repository.add(task);
+    public Mono<Task> addTask(Mono<Task> task) {
+        return repository.add(
+                task.doOnNext(t -> {
+                    t.setCreatedOn(LocalDateTime.now());
+                    t.setUpdatedOn(LocalDateTime.now());
+                }));
     }
 
     @Override
-    public Mono<Task> getTaskById(int taskId) {
+    public Mono<Task> getTaskById(long taskId) {
         return repository.getById(taskId);
     }
 
@@ -33,12 +39,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Task> updateTask(Mono<Task> task) {
+    public Mono<Integer> updateTask(Mono<Task> task) {
         return null;
     }
 
     @Override
-    public boolean removeTaskById(int taskId) {
-        return false;
+    public Mono<Integer> removeTaskById(long taskId) {
+        return null;
     }
 }
