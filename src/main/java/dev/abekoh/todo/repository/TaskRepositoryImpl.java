@@ -19,8 +19,12 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public Mono<Task> add(Task task) {
-        return null;
+    public Mono<Void> add(Mono<Task> task) {
+        return task.flatMap(t -> databaseClient
+                .insert()
+                .into(Task.class)
+                .using(t)
+                .then());
     }
 
     @Override
@@ -38,7 +42,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public Mono<Task> update(Task task) {
+    public Mono<Task> update(Mono<Task> task) {
         return null;
     }
 

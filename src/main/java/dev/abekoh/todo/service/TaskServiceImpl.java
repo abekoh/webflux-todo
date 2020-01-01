@@ -18,13 +18,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Task> addTask(Task task) {
-        return null;
+    public Mono<Void> addTask(Mono<Task> task) {
+        return repository.add(task);
     }
 
     @Override
     public Mono<Task> getTaskById(int taskId) {
-        return this.repository.getById(taskId);
+        return repository.getById(taskId);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Task> updateTask(Task task) {
+    public Mono<Task> updateTask(Mono<Task> task) {
         return null;
     }
 

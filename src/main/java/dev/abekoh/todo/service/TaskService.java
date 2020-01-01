@@ -7,13 +7,13 @@ import reactor.core.publisher.Mono;
 
 public interface TaskService {
 
-    Mono<Task> addTask(Task task);
+    Mono<Void> addTask(Mono<Task> task);
 
     Mono<Task> getTaskById(int taskId);
 
     Flux<Task> getTaskAll();
 
-    Mono<Task> updateTask(Task task);
+    Mono<Task> updateTask(Mono<Task> task);
 
     boolean removeTaskById(int taskId);
 }

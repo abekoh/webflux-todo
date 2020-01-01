@@ -21,7 +21,10 @@ public class TaskHandler {
     }
 
     public Mono<ServerResponse> addOne(ServerRequest request) {
-        return null;
+        Mono<Task> requestTask = request.bodyToMono(Task.class);
+        return ServerResponse
+                .ok()
+                .build(service.addTask(requestTask));
     }
 
     public Mono<ServerResponse> getOne(ServerRequest request) {
