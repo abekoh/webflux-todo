@@ -5,9 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class Task {
-
-    private int taskId;
+public class TaskList {
 
     private int taskListId;
 
@@ -15,13 +13,8 @@ public class Task {
 
     private LocalDateTime updatedOn;
 
-    private String text;
-
-    private LocalDateTime deadline;
-
-    private Boolean completed;
-
-    private Boolean deleted;
+    private String name;
 
     private int priorityRank;
+
 }

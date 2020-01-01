@@ -1,21 +1,18 @@
-package dev.abekoh.todo;
+package dev.abekoh.todo.config;
 
+import dev.abekoh.todo.handler.TaskHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-@EnableR2dbcRepositories
-public class AutoConfiguration {
+public class RouteConfiguration {
     @Bean
-    RouterFunction<ServerResponse> routes(TodoHandler todoHandler) {
-        return RouterFunctions.route(
-                RequestPredicates.GET("/task/{taskId}"),
-                todoHandler::get);
+    RouterFunction<ServerResponse> routes(TaskHandler handler) {
+        return RouterFunctions.nest(RequestPredicates.path("/todo/tasks"),
+                RouterFunctions.route(RequestPredicates.GET("/{taskId}"), handler::getOne));
     }
 }
