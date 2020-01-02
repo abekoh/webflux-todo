@@ -46,8 +46,6 @@ public class TaskServiceImpl implements TaskService {
                 .doOnNext(t -> {
                     Task source = t.getT1();
                     Task existed = t.getT2();
-                    System.out.println(source);
-                    System.out.println(existed);
                     source.setCreatedOn(existed.getCreatedOn());
                     source.setUpdatedOn(LocalDateTime.now());
                 })
