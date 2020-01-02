@@ -19,7 +19,7 @@ public class RouteConfiguration {
                 route(GET("/{taskId}"), handler::getOne)
                         .andRoute(GET("/"), handler::getAll)
                         .andRoute(POST("/"), handler::addOne)
-                        .andRoute(PATCH("/"), handler::updateOne)
+                        .andRoute(PATCH("/{taskId}"), handler::updateOne)
                         .andRoute(DELETE("/{taskId}"), handler::removeOne));
     }
 }

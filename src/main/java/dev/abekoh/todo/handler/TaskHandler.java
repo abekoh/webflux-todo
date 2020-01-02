@@ -58,10 +58,24 @@ public class TaskHandler {
     }
 
     public Mono<ServerResponse> updateOne(ServerRequest request) {
-        return null;
+        logger.info("updateOne: " + request);
+        long taskId = Long.parseLong(request.pathVariable("taskId"));
+        return service.updateTask(taskId, request.bodyToMono(Task.class))
+                .flatMap(updatedCount -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(updatedCount)))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> removeOne(ServerRequest request) {
-        return null;
+        logger.info("removeOne: " + request);
+        long taskId = Long.parseLong(request.pathVariable("taskId"));
+        return service.removeTaskById(taskId)
+                .flatMap(removedCount -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(removedCount)))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

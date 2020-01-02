@@ -38,8 +38,7 @@ public class TaskRepositoryImpl implements TaskRepository {
         return databaseClient
                 .select()
                 .from("task")
-                .matching(Criteria.where("task_id").is(taskId))
-                .matching(Criteria.where("deleted").is("0"))
+                .matching(Criteria.where("task_id").is(taskId).and("deleted").in(Boolean.FALSE))
                 .as(Task.class)
                 .fetch()
                 .one()
@@ -49,8 +48,9 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public Flux<Task> getAll() {
         return databaseClient
-                .select().from("task")
-                .matching(Criteria.where("deleted").is("0"))
+                .select()
+                .from("task")
+                .matching(Criteria.where("deleted").is(Boolean.FALSE))
                 .as(Task.class)
                 .fetch()
                 .all()
@@ -72,10 +72,19 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public Mono<Integer> removeById(long taskId) {
         return databaseClient
-                .delete()
-                .from(Task.class)
-                .matching(Criteria.where("task_id").is(taskId))
+                .select()
+                .from("task")
+                .matching(Criteria.where("task_id").is(taskId).and("deleted").in(Boolean.FALSE))
+                .as(Task.class)
                 .fetch()
-                .rowsUpdated();
+                .one()
+                .doOnNext(task -> task.setDeleted(Boolean.TRUE))
+                .flatMap(task -> databaseClient
+                        .update()
+                        .table(Task.class)
+                        .using(task)
+                        .fetch()
+                        .rowsUpdated())
+                .switchIfEmpty(Mono.empty());
     }
 }

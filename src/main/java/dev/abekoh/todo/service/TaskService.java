@@ -12,7 +12,7 @@ public interface TaskService {
 
     Flux<Task> getTaskAll();
 
-    Mono<Integer> updateTask(Mono<Task> task);
+    Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask);
 
     Mono<Integer> removeTaskById(long taskId);
 }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class TaskList {
 
-    private long taskListId;
+    private Long taskListId;
 
     private LocalDateTime createdOn;
 
@@ -15,6 +15,6 @@ public class TaskList {
 
     private String name;
 
-    private long priorityRank;
+    private Long priorityRank;
 
 }

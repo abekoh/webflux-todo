@@ -2,16 +2,20 @@ package dev.abekoh.todo.entity;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
+@Table("task")
 public class Task {
 
-    private long taskId;
+    @Id
+    private Long taskId;
 
-    private long taskListId;
+    private Long taskListId;
 
     private LocalDateTime createdOn;
 
@@ -25,5 +29,5 @@ public class Task {
 
     private Boolean deleted;
 
-    private long priorityRank;
+    private Long priorityRank;
 }

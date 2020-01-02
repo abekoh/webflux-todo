@@ -39,8 +39,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Integer> updateTask(Mono<Task> task) {
-        return repository.update(task);
+    public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
+        return sourceTask
+                .flatMap(t -> t.getTaskId() == taskId ? Mono.just(t) : Mono.empty())
+                .zipWith(repository.getById(taskId))
+                .doOnNext(t -> {
+                    Task source = t.getT1();
+                    Task existed = t.getT2();
+                    System.out.println(source);
+                    System.out.println(existed);
+                    source.setCreatedOn(existed.getCreatedOn());
+                    source.setUpdatedOn(LocalDateTime.now());
+                })
+                .flatMap(t -> repository.update(Mono.just(t.getT1())));
     }
 
     @Override
