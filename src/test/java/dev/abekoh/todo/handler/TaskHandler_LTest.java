@@ -37,13 +37,13 @@ class TaskHandler_LTest {
                 .thenReturn(Mono.just(task));
 
         webClient.get()
-                .uri("/todo/tasks/1")
+                .uri("/api/v1/todo/tasks/1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.taskId").isEqualTo(1L)
                 .jsonPath("$.text").isEqualTo("やること");
-        
+
 
         Mockito.verify(repository, Mockito.times(1)).getById(1L);
     }

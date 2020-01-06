@@ -15,7 +15,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouteConfiguration {
     @Bean
     RouterFunction<ServerResponse> routes(TaskHandler handler) {
-        return nest(path("/todo/tasks").and(accept(MediaType.APPLICATION_JSON)),
+        return nest(path("/api/v1/todo/tasks").and(accept(MediaType.APPLICATION_JSON)),
                 route(GET("/{taskId}"), handler::getOne)
                         .andRoute(GET("/"), handler::getAll)
                         .andRoute(POST("/"), handler::addOne)
