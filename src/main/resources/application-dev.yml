@@ -1,8 +1,17 @@
+logging:
+  level:
+    org.springframework.data.r2dbc: DEBUG
 spring:
   r2dbc:
+    # H2用設定
+#    url: r2dbc:h2:mem:///todo?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+#    username: sa
+#    password:
+  # mysql用設定
     url: r2dbc:mysql://127.0.0.1:33306/todo
     username: root
     password: mysql
+    initialization-mode: always
 #  rsocket:
 #    server:
 #      mapping-path: /rsocket

@@ -85,6 +85,6 @@ public class TaskRepositoryImpl implements TaskRepository {
                         .using(task)
                         .fetch()
                         .rowsUpdated())
-                .switchIfEmpty(Mono.empty());
+                .switchIfEmpty(Mono.just(0));
     }
 }

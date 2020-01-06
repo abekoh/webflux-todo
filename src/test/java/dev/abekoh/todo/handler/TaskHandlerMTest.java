@@ -1,24 +1,27 @@
 package dev.abekoh.todo.handler;
 
+import dev.abekoh.todo.config.AppConfiguration;
 import dev.abekoh.todo.config.RouteConfiguration;
 import dev.abekoh.todo.entity.Task;
 import dev.abekoh.todo.repository.TaskRepository;
+import dev.abekoh.todo.repository.TaskRepositoryImpl;
 import dev.abekoh.todo.service.TaskServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-@ExtendWith(SpringExtension.class)
+@SpringJUnitConfig
 @WebFluxTest(controllers = TaskHandler.class)
-@Import({TaskServiceImpl.class, RouteConfiguration.class})
-class TaskHandler_LTest {
+@ActiveProfiles("dev")
+@Import({TaskServiceImpl.class, TaskRepositoryImpl.class, AppConfiguration.class, RouteConfiguration.class})
+class TaskHandlerMTest {
 
     @MockBean
     TaskRepository repository;
