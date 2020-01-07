@@ -9,6 +9,7 @@ jobs:
       mysql:
         image: mysql:latest
         env:
+          MYSQL_DATABASE: todo
           MYSQL_ROOT_PASSWORD: mysql
     container:
       image: maven:3.6.3-jdk-11
@@ -23,7 +24,5 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: Create database schema
-      run: mysql --host mysql --port 3306 -uroot -pmysql -e "CREATE DATABASE todo;"
     - name: Test with Maven
       run: mvn -B test --file pom.xml
