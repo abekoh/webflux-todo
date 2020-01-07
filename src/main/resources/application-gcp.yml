@@ -1,0 +1,6 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://172.27.64.3:3306/todo
+    username:
+    password:
+    initialization-mode: never

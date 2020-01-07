@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webflux-todo
+  labels:
+    app: webflux-todo
+  namespace: todo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webflux-todo
+  template:
+    metadata:
+      labels:
+        app: webflux-todo
+    spec:
+      containers:
+        - name: webflux-todo
+          image: gcr.io/abekoh-sand/webflux-todo:latest
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8080
+              path: /actuator/health
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: gcp
+            - name: SPRING_R2DBC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                    name: todo-db
+                    key: username
+            - name: SPRING_R2DBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: todo-db
+                  key: password

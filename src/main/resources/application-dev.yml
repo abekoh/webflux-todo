@@ -1,6 +1,3 @@
-logging:
-  level:
-    org.springframework.data.r2dbc: DEBUG
 spring:
   r2dbc:
     url: r2dbc:mysql://127.0.0.1:33306/todo
