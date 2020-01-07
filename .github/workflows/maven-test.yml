@@ -7,6 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: maven:3.6.3-jdk-11
+    services:
+      mysql:
+        image: mysql:latest
+        ports: 33306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
     steps:
     - uses: actions/checkout@v1
     - name: Cache maven modules
