@@ -9,13 +9,13 @@ jobs:
       mysql:
         image: mysql:latest
         ports: 
-          - 3306:3306
+          - 33306:3306
         env:
           MYSQL_ROOT_PASSWORD: mysql
     container:
       image: maven:3.6.3-jdk-11
       env:
-        SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/todo
+        SPRING_R2DBC_URL: r2dbc:mysql://mysql:33306/todo
     steps:
     - uses: actions/checkout@v1
     - name: Cache maven modules
