@@ -8,9 +8,8 @@ jobs:
     services:
       mysql:
         image: mysql:latest
-        ports: 
-          - 3306:3306
         env:
+          MYSQL_DATABASE: todo
           MYSQL_ROOT_PASSWORD: mysql
     container:
       image: maven:3.6.3-jdk-11
@@ -21,7 +20,7 @@ jobs:
     - name: Cache maven modules
       uses: actions/cache@v1
       with:
-        path: ~/.m2
+        path: /root/.m2
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
