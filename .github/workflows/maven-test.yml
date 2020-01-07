@@ -10,7 +10,8 @@ jobs:
     services:
       mysql:
         image: mysql:latest
-        ports: 33306:3306
+        ports: 
+          - 33306:3306
         env:
           MYSQL_ROOT_PASSWORD: mysql
     steps:
