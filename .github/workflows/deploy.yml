@@ -3,16 +3,16 @@ on: [push]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_DATABASE: todo
-          MYSQL_ROOT_PASSWORD: mysql
-    container:
-      image: maven:3.6.3-jdk-11
-      env:
-        SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/todo
+#    services:
+#      mysql:
+#        image: mysql:latest
+#        env:
+#          MYSQL_DATABASE: todo
+#          MYSQL_ROOT_PASSWORD: mysql
+#    container:
+#      image: maven:3.6.3-jdk-11
+#      env:
+#        SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/todo
     steps:
       - uses: actions/checkout@v1
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
@@ -20,6 +20,7 @@ jobs:
           version: '275.0.0'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - run: gcloud info
       - name: Setup skaffold
         run: |
           # https://skaffold.dev/docs/install/
