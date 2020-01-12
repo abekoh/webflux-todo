@@ -15,9 +15,10 @@ jobs:
         SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/todo
     steps:
       - uses: actions/checkout@v1
+      - run: python -V
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: '275.0.0'
+          version: '270.0.0'
           service_account_key: ${{ secrets.GCP_SA_KEY }}
       - name: Setup skaffold
         run: |
