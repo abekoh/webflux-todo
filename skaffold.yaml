@@ -5,7 +5,9 @@ metadata:
 build:
   artifacts:
   - image: gcr.io/abekoh-sand/webflux-todo
-    jib: {}
+    jib: 
+      args:
+        - -DskipTests
 deploy:
   kubectl:
     manifests:
