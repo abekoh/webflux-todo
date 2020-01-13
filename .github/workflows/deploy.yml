@@ -16,7 +16,8 @@ jobs:
       - name: Gcloud setting
         run: |
           gcloud components install docker-credential-gcr
-          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
+#          gcloud auth configure-docker
+          docker-credential-gcr configure-docker
       - name: Setup skaffold
         run: |
           # https://skaffold.dev/docs/install/
