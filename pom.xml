@@ -129,6 +129,7 @@
                     </from>
                     <to>
                         <image>gcr.io/abekoh-sand/webflux-todo</image>
+                        <credHelper>gcr</credHelper>
                     </to>
                 </configuration>
             </plugin>
