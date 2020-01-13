@@ -16,7 +16,8 @@ jobs:
       - name: Gcloud setting
         run: |
           gcloud components install docker-credential-gcr
-          docker-credential-gcr configure-docker --token-source="gcloud"
+          docker-credential-gcr config -token-source="gcloud"
+          docker-credential-gcr configure-docker
       - name: Setup skaffold
         run: |
           # https://skaffold.dev/docs/install/
