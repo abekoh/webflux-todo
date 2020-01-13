@@ -16,7 +16,6 @@ jobs:
       - name: Gcloud setting
         run: |
           gcloud components install docker-credential-gcr
-#          gcloud auth configure-docker
           docker-credential-gcr configure-docker
       - name: Setup skaffold
         run: |
