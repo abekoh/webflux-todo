@@ -16,7 +16,7 @@ jobs:
       - name: Gcloud setting
         run: |
           gcloud components install docker-credential-gcr
-          docker --verson
+          docker verson
           sudo apt update && sudo apt upgrade docker
           docker-credential-gcr configure-docker
       - name: Setup skaffold
