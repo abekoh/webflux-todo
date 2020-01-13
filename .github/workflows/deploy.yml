@@ -15,9 +15,10 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
       - name: Gcloud setting
         run: |
+          gcloud auth configure-docker
           gcloud components install docker-credential-gcr
           docker-credential-gcr config -token-source="gcloud"
-          gcloud auth configure-docker
+          cat ~/.docker/config.json | jq '.credHelpers |= . + {"gcr.io": "gcr"} + {"us.gcr.io": "gcr"}' > ~/.docker/config.json
       - name: Setup skaffold
         run: |
           # https://skaffold.dev/docs/install/
