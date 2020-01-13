@@ -16,8 +16,11 @@ jobs:
       - name: Gcloud setting
         run: |
           gcloud components install docker-credential-gcr
-          docker version
-          sudo apt update && sudo apt upgrade docker
+          which docker
+          wget https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz
+          tar xzvf docker-19.03.5.tgz
+          ls
+          sudo cp docker/* /usr/bin/
           docker-credential-gcr configure-docker
       - name: Setup skaffold
         run: |
