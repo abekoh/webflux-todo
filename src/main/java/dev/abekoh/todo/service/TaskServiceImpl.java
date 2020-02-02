@@ -41,7 +41,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
         return sourceTask
-                // 変更予定のエンティティとtaskIdが不一致ならば殻にする
+                // 変更予定のエンティティとtaskIdが不一致ならば空にする
                 .flatMap(t -> t.getTaskId() == taskId ? Mono.just(t) : Mono.empty())
                 .zipWith(repository.getById(taskId), (source, existed) -> {
                     source.setCreatedOn(existed.getCreatedOn());
