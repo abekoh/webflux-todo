@@ -1,0 +1,11 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://127.0.0.1:33306/todo
+    username: root
+    password: mysql
+    initialization-mode: always
+#  rsocket:
+#    server:
+#      mapping-path: /rsocket
+#      transport: websocket
+#      port: 8090

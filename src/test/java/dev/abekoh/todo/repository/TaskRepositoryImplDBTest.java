@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 
 @SpringJUnitConfig
 @DataR2dbcTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 class TaskRepositoryImplDBTest {
 
     private static final Task expected01 = new Task().toBuilder()

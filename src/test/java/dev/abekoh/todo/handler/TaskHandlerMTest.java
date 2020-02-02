@@ -29,11 +29,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 
 @SpringJUnitConfig
 @WebFluxTest(controllers = TaskHandler.class)
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @Import({TaskServiceImpl.class, TaskRepositoryImpl.class, AppConfiguration.class, RouteConfiguration.class})
 class TaskHandlerMTest {
 
