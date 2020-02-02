@@ -35,7 +35,7 @@ class TaskRepositoryImplDBTest {
             .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
             .completed(false)
             .deleted(false)
-            .priorityRank(0L)
+            .priorityRank(2L)
             .taskListId(1L)
             .build();
 
@@ -47,7 +47,7 @@ class TaskRepositoryImplDBTest {
             .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
             .completed(false)
             .deleted(false)
-            .priorityRank(0L)
+            .priorityRank(1L)
             .taskListId(1L)
             .build();
 
@@ -59,7 +59,7 @@ class TaskRepositoryImplDBTest {
             .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
             .completed(true)
             .deleted(false)
-            .priorityRank(0L)
+            .priorityRank(3L)
             .taskListId(1L)
             .build();
 
@@ -141,7 +141,7 @@ class TaskRepositoryImplDBTest {
         void getAll() {
             Flux<Task> actual = repository.getAll();
             StepVerifier.create(actual)
-                    .expectNext(expected01, expected02, expected03)
+                    .expectNext(expected02, expected01, expected03)
                     .verifyComplete();
         }
     }

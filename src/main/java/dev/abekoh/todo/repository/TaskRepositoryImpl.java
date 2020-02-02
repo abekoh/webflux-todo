@@ -2,6 +2,7 @@ package dev.abekoh.todo.repository;
 
 import dev.abekoh.todo.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.query.Criteria;
 import org.springframework.stereotype.Repository;
@@ -51,6 +52,7 @@ public class TaskRepositoryImpl implements TaskRepository {
                 .select()
                 .from("task")
                 .matching(Criteria.where("deleted").is(Boolean.FALSE))
+                .orderBy(Sort.by(Sort.Order.asc("priority_rank")))
                 .as(Task.class)
                 .fetch()
                 .all()
