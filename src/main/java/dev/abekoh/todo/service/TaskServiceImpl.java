@@ -40,15 +40,22 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
-        return sourceTask
-                // 変更予定のエンティティとtaskIdが不一致ならば空にする
-                .flatMap(t -> t.getTaskId() == taskId ? Mono.just(t) : Mono.empty())
-                .zipWith(repository.getById(taskId), (source, existed) -> {
-                    source.setCreatedOn(existed.getCreatedOn());
-                    source.setUpdatedOn(LocalDateTime.now());
-                    return source;
+        return repository.getAll()
+                .flatMap(t -> {
+                    if (t.getTaskId() == taskId) {
+                        return sourceTask.zipWith(sourceTask)
+                                .doOnNext(zipped -> {
+                                    Task source = zipped.getT1();
+                                    Task existed = zipped.getT2();
+                                    // CREATED_ONはそのまま、UPDATED_ONは更新する
+                                    source.setCreatedOn(existed.getCreatedOn());
+                                    source.setUpdatedOn(LocalDateTime.now());
+                                })
+                                .flatMap(zipped -> repository.update(Mono.just(zipped.getT1())));
+                    }
+                    return Mono.just(0);
                 })
-                .flatMap(t -> repository.update(Mono.just(t)));
+                .reduce(Integer::sum);
     }
 
     @Override
