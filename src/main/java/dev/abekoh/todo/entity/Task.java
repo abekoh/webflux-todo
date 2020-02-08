@@ -34,4 +34,12 @@ public class Task {
     private Boolean deleted;
 
     private Long priorityRank;
+
+    public void incPriorityRank() {
+        this.priorityRank++;
+    }
+
+    public void decPriorityRank() {
+        this.priorityRank--;
+    }
 }

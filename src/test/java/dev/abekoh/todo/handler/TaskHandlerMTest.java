@@ -12,6 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -24,8 +26,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,10 +43,12 @@ import static org.mockito.ArgumentMatchers.any;
 class TaskHandlerMTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-
+    @Captor
+    ArgumentCaptor<Mono<Task>> captor;
     @MockBean
-    TaskRepository repository;
-
+    private TaskRepository repository;
+    @MockBean
+    private Clock clock;
     @Autowired
     private WebTestClient webClient;
 
@@ -145,7 +153,7 @@ class TaskHandlerMTest {
     @Nested
     class updateOne {
         @Test
-        @DisplayName("1件更新")
+        @DisplayName("1件更新、順序変更なし")
         void updateOneSuccess() {
             Task input = new Task().toBuilder()
                     .taskId(1L)
@@ -159,21 +167,49 @@ class TaskHandlerMTest {
                     .taskListId(1L)
                     .build();
 
-            List<Task> expectedAll = List.of(
-                    new Task().toBuilder()
-                            .taskId(1L)
-                            .text("やること1")
-                            .build(),
-                    new Task().toBuilder()
-                            .taskId(2L)
-                            .text("やること2")
-                            .build()
+            Task oldOne = new Task().toBuilder()
+                    .taskId(1L)
+                    .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                    .text("更新まえ")
+                    .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
+                    .completed(false)
+                    .deleted(false)
+                    .priorityRank(0L)
+                    .taskListId(1L)
+                    .build();
+
+            List<Task> oldAll = List.of(
+                    oldOne
             );
 
+            Task newOne = new Task().toBuilder()
+                    .taskId(1L)
+                    .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                    .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
+                    .text("更新した")
+                    .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
+                    .completed(false)
+                    .deleted(false)
+                    .priorityRank(0L)
+                    .taskListId(1L)
+                    .build();
+
             Mockito.when(repository.getAll())
-                    .thenReturn(Flux.fromIterable(expectedAll));
+                    .thenReturn(Flux.fromIterable(oldAll));
+            Mockito.when(repository.getById(1L))
+                    .thenReturn(Mono.just(oldOne));
             Mockito.when(repository.update(any()))
                     .thenReturn(Mono.just(1));
+
+            // 時間固定
+            Clock fixedClock = Clock.fixed(
+                    LocalDate.of(2020, 2, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                    ZoneId.systemDefault());
+            Mockito.when(clock.instant())
+                    .thenReturn(fixedClock.instant());
+            Mockito.when(clock.getZone())
+                    .thenReturn(fixedClock.getZone());
 
             webClient.patch()
                     .uri("/api/v1/todo/tasks/1")
@@ -184,7 +220,12 @@ class TaskHandlerMTest {
                     .isEqualTo(1);
 
             Mockito.verify(repository, Mockito.times(1)).getAll();
-            Mockito.verify(repository, Mockito.times(1)).update(any());
+            Mockito.verify(repository, Mockito.times(1)).getById(1L);
+            Mockito.verify(repository, Mockito.times(1)).update(captor.capture());
+
+            StepVerifier.create(captor.getValue())
+                    .expectNext(newOne)
+                    .verifyComplete();
         }
     }
 

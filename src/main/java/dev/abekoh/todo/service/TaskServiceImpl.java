@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Service
@@ -14,9 +15,12 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository repository;
 
+    private final Clock clock;
+
     @Autowired
-    public TaskServiceImpl(TaskRepository repository) {
+    public TaskServiceImpl(TaskRepository repository, Clock clock) {
         this.repository = repository;
+        this.clock = clock;
     }
 
     @Override
@@ -41,20 +45,36 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
         return repository.getAll()
-                .flatMap(t -> {
-                    if (t.getTaskId() == taskId) {
-                        return sourceTask.zipWith(sourceTask)
-                                .doOnNext(zipped -> {
-                                    Task source = zipped.getT1();
-                                    Task existed = zipped.getT2();
-                                    // CREATED_ONはそのまま、UPDATED_ONは更新する
-                                    source.setCreatedOn(existed.getCreatedOn());
-                                    source.setUpdatedOn(LocalDateTime.now());
-                                })
-                                .flatMap(zipped -> repository.update(Mono.just(zipped.getT1())));
-                    }
-                    return Mono.just(0);
-                })
+                .flatMap(t -> Mono.zip(Mono.just(t), repository.getById(taskId), sourceTask)
+                        .flatMap(zipped -> {
+                            // 今見ているタスク
+                            Task cursor = zipped.getT1();
+                            // 更新対象の前の状態
+                            Task targetOld = zipped.getT2();
+                            // 更新対象の新しい状態
+                            Task targetNew = zipped.getT3();
+                            // 変更対象ならそのまま更新
+                            if (cursor.getTaskId() == taskId) {
+                                // CREATED_ONはそのまま、UPDATED_ONは更新する
+                                targetNew.setCreatedOn(targetOld.getCreatedOn());
+                                targetNew.setUpdatedOn(LocalDateTime.now(clock));
+                                return Mono.just(targetNew);
+                            } else if (targetNew.getPriorityRank() <= cursor.getPriorityRank() && cursor.getPriorityRank() < targetOld.getPriorityRank()) {
+                                cursor.incPriorityRank();
+                                return Mono.just(cursor);
+                            } else if (targetNew.getPriorityRank() < targetOld.getPriorityRank() && cursor.getPriorityRank().equals(targetOld.getPriorityRank())) {
+                                cursor.setPriorityRank(targetNew.getPriorityRank());
+                                return Mono.just(cursor);
+                            } else if (targetOld.getPriorityRank() < cursor.getPriorityRank() && cursor.getPriorityRank() <= targetNew.getPriorityRank()) {
+                                cursor.decPriorityRank();
+                                return Mono.just(cursor);
+                            } else if (targetOld.getPriorityRank() < targetNew.getPriorityRank() && cursor.getPriorityRank() == targetNew.getPriorityRank()) {
+                                cursor.setPriorityRank(targetOld.getPriorityRank());
+                                return Mono.just(cursor);
+                            }
+                            return Mono.empty();
+                        })
+                        .flatMap(t2 -> repository.update(Mono.just(t2))))
                 .reduce(Integer::sum);
     }
 
