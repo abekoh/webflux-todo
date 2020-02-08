@@ -157,8 +157,6 @@ class TaskHandlerMTest {
         void updateOneSuccess() {
             Task input = new Task().toBuilder()
                     .taskId(1L)
-                    .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                     .text("更新した")
                     .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
                     .completed(false)
