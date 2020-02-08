@@ -9,6 +9,8 @@ import dev.abekoh.todo.repository.TaskRepository;
 import dev.abekoh.todo.repository.TaskRepositoryImpl;
 import dev.abekoh.todo.service.TaskServiceImpl;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -226,16 +228,16 @@ class TaskHandlerMTest {
                     .verifyComplete();
         }
 
-        //        @ParameterizedTest
-//        @CsvSource({
-//                "1, 3",
-//        })
-        @Test
+        @ParameterizedTest(name = "taskId={0}をpriorityRank={1}にしたとき、taskId順にpriorityRankは{2},{3},{4}になる")
+        @CsvSource({
+                "1, 3, 3, 1, 2",
+                "3, 1, 2, 3, 1"
+        })
         @DisplayName("1件更新、順序変更あり")
-        void updateOrderedSuccess() {
+        void updateOrderedSuccess(long from, long to, long order1, long order2, long order3) {
             Task input = new Task().toBuilder()
-                    .taskId(1L)
-                    .priorityRank(3L)
+                    .taskId(from)
+                    .priorityRank(to)
                     .build();
 
             List<Task> oldAll = List.of(
@@ -256,17 +258,17 @@ class TaskHandlerMTest {
             List<Task> newAll = List.of(
                     new Task().toBuilder()
                             .taskId(1L)
-                            .priorityRank(3L)
+                            .priorityRank(order1)
                             .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
                             .build(),
                     new Task().toBuilder()
                             .taskId(2L)
-                            .priorityRank(1L)
+                            .priorityRank(order2)
                             .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
                             .build(),
                     new Task().toBuilder()
                             .taskId(3L)
-                            .priorityRank(2L)
+                            .priorityRank(order3)
                             .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
                             .build()
             );
@@ -274,14 +276,14 @@ class TaskHandlerMTest {
             Mockito.when(repository.getAll())
                     .thenReturn(Flux.fromIterable(oldAll));
 
-            Mockito.when(repository.getById(1L))
-                    .thenReturn(Mono.just(oldAll.get(0)));
+            Mockito.when(repository.getById(from))
+                    .thenReturn(Mono.just(oldAll.get((int) (from - 1L))));
 
             Mockito.when(repository.update(any()))
                     .thenReturn(Mono.just(1));
 
             webClient.patch()
-                    .uri("/api/v1/todo/tasks/1")
+                    .uri("/api/v1/todo/tasks/" + from)
                     .body(BodyInserters.fromValue(input))
                     .exchange()
                     .expectStatus().isOk()
@@ -290,7 +292,7 @@ class TaskHandlerMTest {
 
             Mockito.verify(repository, Mockito.times(1)).getAll();
 
-            Mockito.verify(repository, Mockito.times(3)).getById(1L);
+            Mockito.verify(repository, Mockito.times(3)).getById(from);
 
             Mockito.verify(repository, Mockito.times(3)).update(captor.capture());
             for (int i = 0; i < captor.getAllValues().size(); i++) {
