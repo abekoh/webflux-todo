@@ -8,10 +8,7 @@ import dev.abekoh.todo.entity.Task;
 import dev.abekoh.todo.repository.TaskRepository;
 import dev.abekoh.todo.repository.TaskRepositoryImpl;
 import dev.abekoh.todo.service.TaskServiceImpl;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -51,6 +48,18 @@ class TaskHandlerMTest {
     private Clock clock;
     @Autowired
     private WebTestClient webClient;
+
+    @BeforeEach
+    void setup() {
+        // 時間固定
+        Clock fixedClock = Clock.fixed(
+                LocalDate.of(2020, 2, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+                ZoneId.systemDefault());
+        Mockito.when(clock.instant())
+                .thenReturn(fixedClock.instant());
+        Mockito.when(clock.getZone())
+                .thenReturn(fixedClock.getZone());
+    }
 
     @AfterEach
     void cleanUp() {
@@ -200,15 +209,6 @@ class TaskHandlerMTest {
             Mockito.when(repository.update(any()))
                     .thenReturn(Mono.just(1));
 
-            // 時間固定
-            Clock fixedClock = Clock.fixed(
-                    LocalDate.of(2020, 2, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
-                    ZoneId.systemDefault());
-            Mockito.when(clock.instant())
-                    .thenReturn(fixedClock.instant());
-            Mockito.when(clock.getZone())
-                    .thenReturn(fixedClock.getZone());
-
             webClient.patch()
                     .uri("/api/v1/todo/tasks/1")
                     .body(BodyInserters.fromValue(input))
@@ -224,6 +224,80 @@ class TaskHandlerMTest {
             StepVerifier.create(captor.getValue())
                     .expectNext(newOne)
                     .verifyComplete();
+        }
+
+        //        @ParameterizedTest
+//        @CsvSource({
+//                "1, 3",
+//        })
+        @Test
+        @DisplayName("1件更新、順序変更あり")
+        void updateOrderedSuccess() {
+            Task input = new Task().toBuilder()
+                    .taskId(1L)
+                    .priorityRank(3L)
+                    .build();
+
+            List<Task> oldAll = List.of(
+                    new Task().toBuilder()
+                            .taskId(1L)
+                            .priorityRank(1L)
+                            .build(),
+                    new Task().toBuilder()
+                            .taskId(2L)
+                            .priorityRank(2L)
+                            .build(),
+                    new Task().toBuilder()
+                            .taskId(3L)
+                            .priorityRank(3L)
+                            .build()
+            );
+
+            List<Task> newAll = List.of(
+                    new Task().toBuilder()
+                            .taskId(1L)
+                            .priorityRank(3L)
+                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
+                            .build(),
+                    new Task().toBuilder()
+                            .taskId(2L)
+                            .priorityRank(1L)
+                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
+                            .build(),
+                    new Task().toBuilder()
+                            .taskId(3L)
+                            .priorityRank(2L)
+                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
+                            .build()
+            );
+
+            Mockito.when(repository.getAll())
+                    .thenReturn(Flux.fromIterable(oldAll));
+
+            Mockito.when(repository.getById(1L))
+                    .thenReturn(Mono.just(oldAll.get(0)));
+
+            Mockito.when(repository.update(any()))
+                    .thenReturn(Mono.just(1));
+
+            webClient.patch()
+                    .uri("/api/v1/todo/tasks/1")
+                    .body(BodyInserters.fromValue(input))
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(Integer.class)
+                    .isEqualTo(3);
+
+            Mockito.verify(repository, Mockito.times(1)).getAll();
+
+            Mockito.verify(repository, Mockito.times(3)).getById(1L);
+
+            Mockito.verify(repository, Mockito.times(3)).update(captor.capture());
+            for (int i = 0; i < captor.getAllValues().size(); i++) {
+                StepVerifier.create(captor.getAllValues().get(i))
+                        .expectNext(newAll.get(i))
+                        .verifyComplete();
+            }
         }
     }
 

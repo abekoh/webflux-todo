@@ -45,6 +45,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
         return repository.getAll()
+                // TODO: 毎回getByIdするのやめたい
                 .flatMap(t -> Mono.zip(Mono.just(t), repository.getById(taskId), sourceTask)
                         .flatMap(zipped -> {
                             // 今見ているタスク
@@ -59,16 +60,22 @@ public class TaskServiceImpl implements TaskService {
                                 targetNew.setCreatedOn(targetOld.getCreatedOn());
                                 targetNew.setUpdatedOn(LocalDateTime.now(clock));
                                 return Mono.just(targetNew);
-                            } else if (targetNew.getPriorityRank() <= cursor.getPriorityRank() && cursor.getPriorityRank() < targetOld.getPriorityRank()) {
+                            }
+
+                            cursor.setUpdatedOn(LocalDateTime.now(clock));
+                            if (targetNew.getPriorityRank() <= cursor.getPriorityRank() && cursor.getPriorityRank() < targetOld.getPriorityRank()) {
                                 cursor.incPriorityRank();
                                 return Mono.just(cursor);
-                            } else if (targetNew.getPriorityRank() < targetOld.getPriorityRank() && cursor.getPriorityRank().equals(targetOld.getPriorityRank())) {
+                            }
+                            if (targetNew.getPriorityRank() < targetOld.getPriorityRank() && cursor.getPriorityRank().equals(targetOld.getPriorityRank())) {
                                 cursor.setPriorityRank(targetNew.getPriorityRank());
                                 return Mono.just(cursor);
-                            } else if (targetOld.getPriorityRank() < cursor.getPriorityRank() && cursor.getPriorityRank() <= targetNew.getPriorityRank()) {
+                            }
+                            if (targetOld.getPriorityRank() < cursor.getPriorityRank() && cursor.getPriorityRank() <= targetNew.getPriorityRank()) {
                                 cursor.decPriorityRank();
                                 return Mono.just(cursor);
-                            } else if (targetOld.getPriorityRank() < targetNew.getPriorityRank() && cursor.getPriorityRank() == targetNew.getPriorityRank()) {
+                            }
+                            if (targetOld.getPriorityRank() < targetNew.getPriorityRank() && cursor.getPriorityRank() == targetNew.getPriorityRank()) {
                                 cursor.setPriorityRank(targetOld.getPriorityRank());
                                 return Mono.just(cursor);
                             }
