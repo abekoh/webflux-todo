@@ -44,45 +44,15 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask) {
-        return repository.getAll()
-                // TODO: 毎回getByIdするのやめたい
-                .flatMap(t -> Mono.zip(Mono.just(t), repository.getById(taskId), sourceTask)
-                        .flatMap(zipped -> {
-                            // 今見ているタスク
-                            Task cursor = zipped.getT1();
-                            // 更新対象の前の状態
-                            Task targetOld = zipped.getT2();
-                            // 更新対象の新しい状態
-                            Task targetNew = zipped.getT3();
-                            // 変更対象ならそのまま更新
-                            if (cursor.getTaskId() == taskId) {
-                                // CREATED_ONはそのまま、UPDATED_ONは更新する
-                                targetNew.setCreatedOn(targetOld.getCreatedOn());
-                                targetNew.setUpdatedOn(LocalDateTime.now(clock));
-                                return Mono.just(targetNew);
-                            }
-
-                            cursor.setUpdatedOn(LocalDateTime.now(clock));
-                            if (targetNew.getPriorityRank() <= cursor.getPriorityRank() && cursor.getPriorityRank() < targetOld.getPriorityRank()) {
-                                cursor.incPriorityRank();
-                                return Mono.just(cursor);
-                            }
-                            if (targetNew.getPriorityRank() < targetOld.getPriorityRank() && cursor.getPriorityRank().equals(targetOld.getPriorityRank())) {
-                                cursor.setPriorityRank(targetNew.getPriorityRank());
-                                return Mono.just(cursor);
-                            }
-                            if (targetOld.getPriorityRank() < cursor.getPriorityRank() && cursor.getPriorityRank() <= targetNew.getPriorityRank()) {
-                                cursor.decPriorityRank();
-                                return Mono.just(cursor);
-                            }
-                            if (targetOld.getPriorityRank() < targetNew.getPriorityRank() && cursor.getPriorityRank() == targetNew.getPriorityRank()) {
-                                cursor.setPriorityRank(targetOld.getPriorityRank());
-                                return Mono.just(cursor);
-                            }
-                            return Mono.empty();
-                        })
-                        .flatMap(t2 -> repository.update(Mono.just(t2))))
-                .reduce(Integer::sum);
+        return sourceTask
+                // 変更予定のエンティティとtaskIdが不一致ならば空にする
+                .flatMap(t -> t.getTaskId() == taskId ? Mono.just(t) : Mono.empty())
+                .zipWith(repository.getById(taskId), (source, existed) -> {
+                    source.setCreatedOn(existed.getCreatedOn());
+                    source.setUpdatedOn(LocalDateTime.now(clock));
+                    return source;
+                })
+                .flatMap(t -> repository.update(Mono.just(t)));
     }
 
     @Override

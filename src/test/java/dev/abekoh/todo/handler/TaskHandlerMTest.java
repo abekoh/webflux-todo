@@ -162,7 +162,7 @@ class TaskHandlerMTest {
     @Nested
     class updateOne {
         @Test
-        @DisplayName("1件更新、順序変更なし")
+        @DisplayName("1件更新")
         void updateOneSuccess() {
             Task input = new Task().toBuilder()
                     .taskId(1L)
@@ -186,10 +186,6 @@ class TaskHandlerMTest {
                     .taskListId(1L)
                     .build();
 
-            List<Task> oldAll = List.of(
-                    oldOne
-            );
-
             Task newOne = new Task().toBuilder()
                     .taskId(1L)
                     .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
@@ -202,8 +198,6 @@ class TaskHandlerMTest {
                     .taskListId(1L)
                     .build();
 
-            Mockito.when(repository.getAll())
-                    .thenReturn(Flux.fromIterable(oldAll));
             Mockito.when(repository.getById(1L))
                     .thenReturn(Mono.just(oldOne));
             Mockito.when(repository.update(any()))
@@ -217,87 +211,12 @@ class TaskHandlerMTest {
                     .expectBody(Integer.class)
                     .isEqualTo(1);
 
-            Mockito.verify(repository, Mockito.times(1)).getAll();
             Mockito.verify(repository, Mockito.times(1)).getById(1L);
             Mockito.verify(repository, Mockito.times(1)).update(captor.capture());
 
             StepVerifier.create(captor.getValue())
                     .expectNext(newOne)
                     .verifyComplete();
-        }
-
-        //        @ParameterizedTest
-//        @CsvSource({
-//                "1, 3",
-//        })
-        @Test
-        @DisplayName("1件更新、順序変更あり")
-        void updateOrderedSuccess() {
-            Task input = new Task().toBuilder()
-                    .taskId(1L)
-                    .priorityRank(3L)
-                    .build();
-
-            List<Task> oldAll = List.of(
-                    new Task().toBuilder()
-                            .taskId(1L)
-                            .priorityRank(1L)
-                            .build(),
-                    new Task().toBuilder()
-                            .taskId(2L)
-                            .priorityRank(2L)
-                            .build(),
-                    new Task().toBuilder()
-                            .taskId(3L)
-                            .priorityRank(3L)
-                            .build()
-            );
-
-            List<Task> newAll = List.of(
-                    new Task().toBuilder()
-                            .taskId(1L)
-                            .priorityRank(3L)
-                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
-                            .build(),
-                    new Task().toBuilder()
-                            .taskId(2L)
-                            .priorityRank(1L)
-                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
-                            .build(),
-                    new Task().toBuilder()
-                            .taskId(3L)
-                            .priorityRank(2L)
-                            .updatedOn(LocalDateTime.of(2020, 2, 1, 0, 0, 0))
-                            .build()
-            );
-
-            Mockito.when(repository.getAll())
-                    .thenReturn(Flux.fromIterable(oldAll));
-
-            Mockito.when(repository.getById(1L))
-                    .thenReturn(Mono.just(oldAll.get(0)));
-
-            Mockito.when(repository.update(any()))
-                    .thenReturn(Mono.just(1));
-
-            webClient.patch()
-                    .uri("/api/v1/todo/tasks/1")
-                    .body(BodyInserters.fromValue(input))
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody(Integer.class)
-                    .isEqualTo(3);
-
-            Mockito.verify(repository, Mockito.times(1)).getAll();
-
-            Mockito.verify(repository, Mockito.times(3)).getById(1L);
-
-            Mockito.verify(repository, Mockito.times(3)).update(captor.capture());
-            for (int i = 0; i < captor.getAllValues().size(); i++) {
-                StepVerifier.create(captor.getAllValues().get(i))
-                        .expectNext(newAll.get(i))
-                        .verifyComplete();
-            }
         }
     }
 
