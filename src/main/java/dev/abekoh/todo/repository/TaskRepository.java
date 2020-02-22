@@ -16,4 +16,5 @@ public interface TaskRepository {
 
     Mono<Integer> removeById(long taskId);
 
+    Mono<Integer> getNextId();
 }

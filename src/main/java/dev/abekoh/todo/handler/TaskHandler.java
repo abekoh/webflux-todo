@@ -78,4 +78,14 @@ public class TaskHandler {
                         .body(BodyInserters.fromValue(removedCount)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
+
+    public Mono<ServerResponse> getNextId(ServerRequest request) {
+        logger.info("getNextId: " + request);
+        return service.getNextId()
+                .flatMap(nextId -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(nextId)))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }

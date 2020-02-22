@@ -70,7 +70,7 @@ class TaskHandlerMTest {
     class addOne {
         @Test
         @DisplayName("1件追加")
-        void addOneSuccess() throws JsonProcessingException {
+        void addOneSuccess() {
             Task input = new Task().toBuilder()
                     .text("やること")
                     .taskListId(1L)
@@ -248,6 +248,25 @@ class TaskHandlerMTest {
                     .isEqualTo(1);
 
             Mockito.verify(repository, Mockito.times(1)).removeById(1L);
+        }
+    }
+
+    @Nested
+    class getNextId {
+        @Test
+        @DisplayName("1件取得")
+        void getNextIdOnSuccess() {
+            Mockito.when(repository.getNextId())
+                    .thenReturn(Mono.just(1));
+
+            webClient.get()
+                    .uri("/api/v1/todo/nextTaskId")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(Integer.class)
+                    .isEqualTo(1);
+
+            Mockito.verify(repository, Mockito.times(1)).getNextId();
         }
     }
 }

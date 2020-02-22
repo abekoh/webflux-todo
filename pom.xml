@@ -77,7 +77,7 @@
         <dependency>
             <groupId>dev.miku</groupId>
             <artifactId>r2dbc-mysql</artifactId>
-            <version>0.8.0.RELEASE</version>
+            <version>0.8.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

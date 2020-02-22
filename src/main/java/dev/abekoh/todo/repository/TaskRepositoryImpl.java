@@ -9,10 +9,13 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigInteger;
+
 @Repository
 public class TaskRepositoryImpl implements TaskRepository {
 
     private final DatabaseClient databaseClient;
+
 
     @Autowired
     public TaskRepositoryImpl(DatabaseClient databaseClient) {
@@ -88,5 +91,15 @@ public class TaskRepositoryImpl implements TaskRepository {
                         .fetch()
                         .rowsUpdated())
                 .switchIfEmpty(Mono.just(0));
+    }
+
+    @Override
+    public Mono<Integer> getNextId() {
+        return databaseClient.execute("select AUTO_INCREMENT from information_schema.TABLES where TABLE_NAME = 'task';")
+                .fetch()
+                .one()
+                .flatMap(result -> Mono.just(result.get("AUTO_INCREMENT")))
+                .cast(BigInteger.class)
+                .flatMap(res -> Mono.just(res.intValue()));
     }
 }

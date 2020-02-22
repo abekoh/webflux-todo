@@ -60,4 +60,9 @@ public class TaskServiceImpl implements TaskService {
     public Mono<Integer> removeTaskById(long taskId) {
         return repository.removeById(taskId);
     }
+
+    @Override
+    public Mono<Integer> getNextId() {
+        return repository.getNextId();
+    }
 }

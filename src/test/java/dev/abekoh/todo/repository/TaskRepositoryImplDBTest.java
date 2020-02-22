@@ -93,7 +93,7 @@ class TaskRepositoryImplDBTest {
             // taskIdのみnull
             Task input = new Task().toBuilder()
                     .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 00, 0))
+                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                     .text("追加")
                     .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
                     .completed(false)
@@ -138,7 +138,7 @@ class TaskRepositoryImplDBTest {
     class getAll {
         @Test
         @DisplayName("全件取得")
-        void getAll() {
+        void getAllTasks() {
             Flux<Task> actual = repository.getAll();
             StepVerifier.create(actual)
                     .expectNext(expected02, expected01, expected03)
@@ -153,7 +153,7 @@ class TaskRepositoryImplDBTest {
         void updateOne() {
             Task input = new Task().toBuilder()
                     .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 00, 0))
+                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                     .taskId(1L)
                     .text("更新")
                     .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
@@ -174,7 +174,7 @@ class TaskRepositoryImplDBTest {
         void updateNothing() {
             Task input = new Task().toBuilder()
                     .createdOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
-                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 00, 0))
+                    .updatedOn(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                     .taskId(99L)
                     .text("更新")
                     .deadline(LocalDateTime.of(2020, 1, 1, 0, 0, 1))
@@ -208,6 +208,18 @@ class TaskRepositoryImplDBTest {
             Mono<Integer> actual = repository.removeById(99L);
             StepVerifier.create(actual)
                     .expectNext(0)
+                    .verifyComplete();
+        }
+    }
+
+    @Nested
+    class getNextId {
+        @Test
+        @DisplayName("1件取得")
+        void getOne() {
+            Mono<Integer> actual = repository.getNextId();
+            StepVerifier.create(actual)
+                    .expectNext(5)
                     .verifyComplete();
         }
     }

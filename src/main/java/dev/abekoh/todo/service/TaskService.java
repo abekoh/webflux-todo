@@ -15,4 +15,6 @@ public interface TaskService {
     Mono<Integer> updateTask(long taskId, Mono<Task> sourceTask);
 
     Mono<Integer> removeTaskById(long taskId);
+
+    Mono<Integer> getNextId();
 }

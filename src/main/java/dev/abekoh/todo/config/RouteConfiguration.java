@@ -15,11 +15,12 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouteConfiguration {
     @Bean
     RouterFunction<ServerResponse> routes(TaskHandler handler) {
-        return nest(path("/api/v1/todo/tasks").and(accept(MediaType.APPLICATION_JSON)),
-                route(GET("/{taskId}"), handler::getOne)
+        return nest(path("/api/v1/todo").and(accept(MediaType.APPLICATION_JSON)),
+                nest(path("/tasks"), route(GET("/{taskId}"), handler::getOne)
                         .andRoute(GET("/"), handler::getAll)
                         .andRoute(POST("/"), handler::addOne)
                         .andRoute(PATCH("/{taskId}"), handler::updateOne)
-                        .andRoute(DELETE("/{taskId}"), handler::removeOne));
+                        .andRoute(DELETE("/{taskId}"), handler::removeOne))
+                        .andNest(path("/nextTaskId"), route(GET("/"), handler::getNextId)));
     }
 }
