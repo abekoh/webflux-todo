@@ -95,10 +95,10 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Mono<Integer> getNextId() {
-        return databaseClient.execute("select AUTO_INCREMENT from information_schema.TABLES where TABLE_NAME = 'task';")
+        return databaseClient.execute("select AUTOINC from information_schema.INNODB_TABLESTATS where name = 'todo/task';")
                 .fetch()
                 .one()
-                .flatMap(result -> Mono.just(result.get("AUTO_INCREMENT")))
+                .flatMap(result -> Mono.just(result.get("AUTOINC")))
                 .cast(BigInteger.class)
                 .flatMap(res -> Mono.just(res.intValue()));
     }
