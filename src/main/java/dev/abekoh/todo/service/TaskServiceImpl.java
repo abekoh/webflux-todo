@@ -27,6 +27,7 @@ public class TaskServiceImpl implements TaskService {
     public Mono<Task> addTask(Mono<Task> task) {
         return repository.add(
                 task.doOnNext(t -> {
+                    t.setTaskId(null);
                     t.setCreatedOn(LocalDateTime.now());
                     t.setUpdatedOn(LocalDateTime.now());
                 }));
