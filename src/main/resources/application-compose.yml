@@ -1,6 +1,6 @@
 spring:
   r2dbc:
-    url: r2dbc:mysql://db:33306/todo
+    url: r2dbc:mysql://db:3306/todo
     username: abekoh
     password: hokeba
     initialization-mode: never
