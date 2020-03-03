@@ -111,28 +111,28 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>1.8.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <from>
-                        <image>openjdk:11-jdk</image>
-                    </from>
-                    <to>
-                        <image>gcr.io/abekoh-sand/webflux-todo</image>
-                        <credHelper>gcr</credHelper>
-                    </to>
-                </configuration>
-            </plugin>
+            <!-- <plugin> -->
+            <!--     <groupId>com.google.cloud.tools</groupId> -->
+            <!--     <artifactId>jib&#45;maven&#45;plugin</artifactId> -->
+            <!--     <version>1.8.0</version> -->
+            <!--     <executions> -->
+            <!--         <execution> -->
+            <!--             <phase>package</phase> -->
+            <!--             <goals> -->
+            <!--                 <goal>build</goal> -->
+            <!--             </goals> -->
+            <!--         </execution> -->
+            <!--     </executions> -->
+            <!--     <configuration> -->
+            <!--         <from> -->
+            <!--             <image>openjdk:11&#45;jdk</image> -->
+            <!--         </from> -->
+            <!--         <to> -->
+            <!--             <image>gcr.io/abekoh&#45;sand/webflux&#45;todo</image> -->
+            <!--             <credHelper>gcr</credHelper> -->
+            <!--         </to> -->
+            <!--     </configuration> -->
+            <!-- </plugin> -->
         </plugins>
     </build>
 
